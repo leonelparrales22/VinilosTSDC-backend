@@ -19,7 +19,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/\"")
+        }
         release {
+            buildConfigField("String", "BASE_URL", "\"https://heroku.com/\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -36,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -67,6 +72,9 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
     
+    // Coil for image loading
+    implementation(libs.coilCompose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

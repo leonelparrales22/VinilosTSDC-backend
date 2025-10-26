@@ -6,6 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.vinilostsdc_frontend.presentation.screen.AlbumDetailScreen
 import com.example.vinilostsdc_frontend.presentation.screen.AlbumListScreen
 import com.example.vinilostsdc_frontend.presentation.screen.ArtistListScreen
 import com.example.vinilostsdc_frontend.presentation.screen.CollectorListScreen
@@ -32,9 +35,17 @@ class MainActivity : ComponentActivity() {
                     composable("albums") {
                         AlbumListScreen(
                             onBack = { navController.popBackStack() },
-                            onAlbumClick = { album ->
-                                // TODO: Navigate to album detail
-                            }
+                            onAlbumClick = { album -> navController.navigate("album_detail/${album.id}") }
+                        )
+                    }
+                    composable(
+                        route = "album_detail/{albumId}",
+                        arguments = listOf(navArgument("albumId") { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val albumId = backStackEntry.arguments?.getInt("albumId") ?: return@composable
+                        AlbumDetailScreen(
+                            albumId = albumId,
+                            onBack = { navController.popBackStack() }
                         )
                     }
                     composable("artists") {

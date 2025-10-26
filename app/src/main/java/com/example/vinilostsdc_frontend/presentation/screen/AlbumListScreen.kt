@@ -28,84 +28,115 @@ fun AlbumListScreen(
     viewModel: AlbumViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = AlbumViewModelFactory())
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var searchText by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.getAlbums()
     }
 
     Scaffold(
+        containerColor = Color(0xFFF8F4E6), // Fondo claro
         topBar = {
             TopAppBar(
-                title = { 
-                    Text(
-                        text = "Catálogo de Álbumes", 
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    ) 
+                title = {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "Álbumes",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            Icons.Default.ArrowBack, 
-                            contentDescription = "Atrás", 
-                            tint = Color.White
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Atrás",
+                            tint = Color.Black
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF424242)
+                    containerColor = Color(0xFFEDEDED)
                 )
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    label = { Text("Nombre del álbum") },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = { /* Implementar búsqueda si es necesario */ },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED))
+                ) {
+                    Text("Buscar", color = Color.Black)
                 }
-                uiState.errorMessage != null -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = uiState.errorMessage ?: "Error desconocido",
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Button(
-                            onClick = { 
-                                viewModel.clearError()
-                                viewModel.getAlbums()
-                            }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(modifier = Modifier.fillMaxSize()) {
+                when {
+                    uiState.isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                    uiState.errorMessage != null -> {
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("Reintentar")
+                            Text(
+                                text = uiState.errorMessage ?: "Error desconocido",
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                            Button(
+                                onClick = {
+                                    viewModel.clearError()
+                                    viewModel.getAlbums()
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+                            ) {
+                                Text("Reintentar", color = Color.White)
+                            }
                         }
                     }
-                }
-                uiState.albums.isEmpty() -> {
-                    Text(
-                        text = "No hay álbumes disponibles",
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(uiState.albums) { album ->
-                            AlbumItem(
-                                album = album,
-                                onClick = { onAlbumClick(album) }
-                            )
+                    uiState.albums.isEmpty() -> {
+                        Text(
+                            text = "No hay álbumes disponibles",
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Color.Black
+                        )
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(uiState.albums.filter { it.name.contains(searchText, ignoreCase = true) }) { album ->
+                                AlbumItem(
+                                    album = album,
+                                    onClick = { onAlbumClick(album) }
+                                )
+                            }
                         }
                     }
                 }
@@ -122,50 +153,27 @@ fun AlbumItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(48.dp),
         onClick = onClick,
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF666666)
+            containerColor = Color(0xFFEDEDED)
         ),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.CenterStart
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = album.name,
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = album.genre,
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 14.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = album.releaseDate,
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            Text(
+                text = album.name,
+                color = Color.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 16.dp)
+            )
         }
     }
 }
