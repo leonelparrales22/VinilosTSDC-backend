@@ -24,6 +24,9 @@ import com.example.vinilostsdc_frontend.presentation.screen.AlbumListScreen
 import com.example.vinilostsdc_frontend.presentation.screen.ArtistListScreen
 import com.example.vinilostsdc_frontend.presentation.screen.CollectorListScreen
 import com.example.vinilostsdc_frontend.presentation.screen.CrearAlbumScreen
+import com.example.vinilostsdc_frontend.presentation.screen.VisitanteMenuScreen
+import com.example.vinilostsdc_frontend.presentation.screen.RoleSelectionScreen
+import com.example.vinilostsdc_frontend.presentation.screen.BlankScreen
 import com.example.vinilostsdc_frontend.ui.theme.VinilosTSDCfrontendTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,9 +35,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             VinilosTSDCfrontendTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "main") {
-                    composable("main") { 
-                        MainScreen(navController) 
+                NavHost(navController = navController, startDestination = "role_selection") {
+                    composable("role_selection") {
+                        RoleSelectionScreen(
+                            onVisitante = { navController.navigate("main") },
+                            onColeccionista = { navController.navigate("coleccionista") }
+                        )
+                    }
+                    composable("main") {
+                        VisitanteMenuScreen(navController)
+                    }
+                    composable("coleccionista") {
+                        BlankScreen()
                     }
                     composable("albums") {
                         AlbumListScreen(
@@ -60,111 +72,14 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
-                    composable("crear_album") { 
+                    composable("crear_album") {
                         CrearAlbumScreen(
-                            onBack = { navController.popBackStack() }, 
+                            onBack = { navController.popBackStack() },
                             onSave = { navController.popBackStack() }
-                        ) 
+                        )
                     }
                 }
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainScreen(navController: NavHostController) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = "Vinilos",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF424242)
-                )
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 32.dp, vertical = 40.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            MenuButton(
-                text = "Catálogo de Álbumes",
-                onClick = { navController.navigate("albums") }
-            )
-            
-            MenuButton(
-                text = "Listado de Artistas",
-                onClick = { navController.navigate("artists") }
-            )
-            
-            MenuButton(
-                text = "Listado de Coleccionistas",
-                onClick = { navController.navigate("collectors") }
-            )
-            
-            MenuButton(
-                text = "Crear un Álbum",
-                onClick = { navController.navigate("crear_album") }
-            )
-        }
-    }
-}
-
-@Composable
-fun MenuButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(80.dp)
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF666666)
-        ),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = text,
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    VinilosTSDCfrontendTheme {
-        val navController = rememberNavController()
-        MainScreen(navController)
     }
 }
