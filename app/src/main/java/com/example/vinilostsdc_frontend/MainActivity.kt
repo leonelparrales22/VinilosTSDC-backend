@@ -20,6 +20,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vinilostsdc_frontend.presentation.screen.AlbumListScreen
+import com.example.vinilostsdc_frontend.presentation.screen.ArtistListScreen
+import com.example.vinilostsdc_frontend.presentation.screen.CollectorListScreen
+import com.example.vinilostsdc_frontend.presentation.screen.CrearAlbumScreen
 import com.example.vinilostsdc_frontend.ui.theme.VinilosTSDCfrontendTheme
 
 class MainActivity : ComponentActivity() {
@@ -29,8 +33,39 @@ class MainActivity : ComponentActivity() {
             VinilosTSDCfrontendTheme {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "main") {
-                    composable("main") { MainScreen(navController) }
-                    composable("crear_album") { CrearAlbumScreen(onBack = { navController.popBackStack() }, onSave = { /* TODO guardar */ }) }
+                    composable("main") { 
+                        MainScreen(navController) 
+                    }
+                    composable("albums") {
+                        AlbumListScreen(
+                            onBack = { navController.popBackStack() },
+                            onAlbumClick = { album ->
+                                // TODO: Navigate to album detail
+                            }
+                        )
+                    }
+                    composable("artists") {
+                        ArtistListScreen(
+                            onBack = { navController.popBackStack() },
+                            onArtistClick = { artist ->
+                                // TODO: Navigate to artist detail
+                            }
+                        )
+                    }
+                    composable("collectors") {
+                        CollectorListScreen(
+                            onBack = { navController.popBackStack() },
+                            onCollectorClick = { collector ->
+                                // TODO: Navigate to collector detail
+                            }
+                        )
+                    }
+                    composable("crear_album") { 
+                        CrearAlbumScreen(
+                            onBack = { navController.popBackStack() }, 
+                            onSave = { navController.popBackStack() }
+                        ) 
+                    }
                 }
             }
         }
@@ -70,17 +105,17 @@ fun MainScreen(navController: NavHostController) {
         ) {
             MenuButton(
                 text = "Catálogo de Álbumes",
-                onClick = { /* TODO: Navegar a catálogo de álbumes */ }
+                onClick = { navController.navigate("albums") }
             )
             
             MenuButton(
                 text = "Listado de Artistas",
-                onClick = { /* TODO: Navegar a listado de artistas */ }
+                onClick = { navController.navigate("artists") }
             )
             
             MenuButton(
                 text = "Listado de Coleccionistas",
-                onClick = { /* TODO: Navegar a listado de coleccionistas */ }
+                onClick = { navController.navigate("collectors") }
             )
             
             MenuButton(

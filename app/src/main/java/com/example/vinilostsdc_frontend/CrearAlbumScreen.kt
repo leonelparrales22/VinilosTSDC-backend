@@ -1,4 +1,4 @@
-package com.example.vinilostsdc_frontend
+package com.example.vinilostsdc_frontend.presentation.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,12 +15,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.vinilostsdc_frontend.presentation.viewmodel.AlbumViewModel
+import com.example.vinilostsdc_frontend.presentation.viewmodel.AlbumViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrearAlbumScreen(
     onBack: () -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    viewModel: AlbumViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = AlbumViewModelFactory())
 ) {
     var portada by remember { mutableStateOf(TextFieldValue()) }
     var nombre by remember { mutableStateOf(TextFieldValue()) }
@@ -30,6 +34,24 @@ fun CrearAlbumScreen(
     val generos = listOf("Rock", "Pop", "Jazz", "Clasica", "Funk")
     var tracks by remember { mutableStateOf(TextFieldValue()) }
     var descripcion by remember { mutableStateOf(TextFieldValue()) }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Observe album creation result
+    LaunchedEffect(uiState.albumCreated) {
+        if (uiState.albumCreated) {
+            viewModel.clearAlbumCreated()
+            onSave()
+        }
+    }
+
+    // Show error message if any
+    uiState.errorMessage?.let { errorMessage ->
+        LaunchedEffect(errorMessage) {
+            // You can show a snackbar or toast here
+            viewModel.clearError()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -55,22 +77,25 @@ fun CrearAlbumScreen(
                 value = portada,
                 onValueChange = { portada = it },
                 label = { Text("Enlace de Portada (URL)") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isCreatingAlbum
             )
 
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre del Álbum") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isCreatingAlbum
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = fecha,
                     onValueChange = { fecha = it },
-                    label = { Text("Fecha de Lanzamiento") },
-                    modifier = Modifier.weight(1f)
+                    label = { Text("Fecha de Lanzamiento (YYYY-MM-DD)") },
+                    modifier = Modifier.weight(1f),
+                    enabled = !uiState.isCreatingAlbum
                 )
                 IconButton(onClick = { /* TODO: show date picker */ }) {
                     Icon(Icons.Default.CalendarToday, contentDescription = "Fecha")
@@ -85,25 +110,23 @@ fun CrearAlbumScreen(
                     label = { Text("Género Musical") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { generoExpanded = true },
-                    readOnly = true
+                        .clickable { if (!uiState.isCreatingAlbum) generoExpanded = true },
+                    readOnly = true,
+                    enabled = !uiState.isCreatingAlbum
                 )
-                DropdownMenu(expanded = generoExpanded, onDismissRequest = { generoExpanded = false }) {
+                DropdownMenu(
+                    expanded = generoExpanded && !uiState.isCreatingAlbum, 
+                    onDismissRequest = { generoExpanded = false }
+                ) {
                     generos.forEach { g ->
-                        DropdownMenuItem(text = { Text(g) }, onClick = { generoSeleccionado = g; generoExpanded = false })
+                        DropdownMenuItem(
+                            text = { Text(g) }, 
+                            onClick = { 
+                                generoSeleccionado = g
+                                generoExpanded = false 
+                            }
+                        )
                     }
-                }
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    value = tracks,
-                    onValueChange = { tracks = it },
-                    label = { Text("Agregar Tracks") },
-                    modifier = Modifier.weight(1f)
-                )
-                IconButton(onClick = { /* TODO: open track picker or add action */ }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Agregar")
                 }
             }
 
@@ -114,19 +137,64 @@ fun CrearAlbumScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
-                maxLines = 5
+                maxLines = 5,
+                enabled = !uiState.isCreatingAlbum
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
-                onClick = onSave,
+                onClick = {
+                    if (nombre.text.isNotBlank() && 
+                        portada.text.isNotBlank() && 
+                        fecha.text.isNotBlank() && 
+                        generoSeleccionado.isNotBlank() && 
+                        descripcion.text.isNotBlank()) {
+                        
+                        viewModel.createAlbum(
+                            name = nombre.text,
+                            cover = portada.text,
+                            releaseDate = fecha.text,
+                            description = descripcion.text,
+                            genre = generoSeleccionado
+                        )
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEEEEEE))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEEEEEE)),
+                enabled = !uiState.isCreatingAlbum && 
+                         nombre.text.isNotBlank() && 
+                         portada.text.isNotBlank() && 
+                         fecha.text.isNotBlank() && 
+                         generoSeleccionado.isNotBlank() && 
+                         descripcion.text.isNotBlank()
             ) {
-                Text(text = "Guardar", color = Color.Black)
+                if (uiState.isCreatingAlbum) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color.Black
+                    )
+                } else {
+                    Text(text = "Guardar", color = Color.Black)
+                }
+            }
+
+            // Error message display
+            uiState.errorMessage?.let { error ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = error,
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
             }
         }
     }
