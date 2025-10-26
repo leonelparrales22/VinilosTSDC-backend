@@ -1,5 +1,6 @@
 package com.example.vinilostsdc_frontend.di
 
+import com.example.vinilostsdc_frontend.BuildConfig
 import com.example.vinilostsdc_frontend.data.repository.AlbumRepository
 import com.example.vinilostsdc_frontend.data.repository.AlbumRepositoryImpl
 import com.example.vinilostsdc_frontend.data.repository.ArtistRepository
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 object NetworkModule {
 
-    private const val BASE_URL = "https://back-vynils-qa.herokuapp.com/"
+    private const val BASE_URL = BuildConfig.BASE_URL
 
     private val gson: Gson by lazy {
         GsonBuilder()
