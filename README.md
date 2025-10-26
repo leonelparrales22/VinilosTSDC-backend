@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Esta aplicación es un backend para la plataforma VinilosTSDC, implementada en Android utilizando Kotlin y Jetpack Compose. Permite a los usuarios seleccionar roles (Visitante o Coleccionista), navegar por menús, y gestionar álbumes musicales con funcionalidades de listado y detalle.
+Esta aplicación es un frontend para la plataforma VinilosTSDC, implementada en Android utilizando Kotlin y Jetpack Compose. Permite a los usuarios seleccionar roles (Visitante o Coleccionista), navegar por menús, y gestionar álbumes musicales con funcionalidades de listado y detalle.
 
 ## Arquitectura
 
@@ -18,9 +18,6 @@ La aplicación sigue los patrones de diseño MVVM (Model-View-ViewModel), Reposi
 - **UI Framework**: Jetpack Compose
 - **Navegación**: Navigation Compose
 - **Gestión de Estado**: ViewModel con StateFlow
-- **Red**: Retrofit con OkHttp y Gson
-- **Inyección de Dependencias**: Manual (planeado migrar a Hilt)
-- **Build Tool**: Gradle (Kotlin DSL)
 
 ## Instalación y Ejecución
 
@@ -57,17 +54,3 @@ app/src/main/java/com/example/vinilostsdc_frontend/
 - `GET /albums/{id}`: Obtiene detalles de un álbum específico.
 - (Otros endpoints para artistas y coleccionistas están definidos en ApiService.kt)
 
-## Mejoras Pendientes
-
-- Migrar a Hilt para inyección de dependencias.
-- Añadir pruebas unitarias para ViewModels y repositorios.
-- Mejorar manejo de errores para casos edge.
-- Verificar fuente única de verdad en la lógica de datos.
-
-## Contribución
-
-Para contribuir, crea un pull request con tus cambios. Asegúrate de seguir las convenciones de código y añadir tests si es necesario.
-
-## Licencia
-
-[Especifica la licencia si aplica]
