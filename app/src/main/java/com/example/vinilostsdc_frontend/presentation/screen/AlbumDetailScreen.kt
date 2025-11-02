@@ -17,6 +17,7 @@ import com.example.vinilostsdc_frontend.presentation.viewmodel.AlbumViewModel
 import com.example.vinilostsdc_frontend.presentation.viewmodel.AlbumViewModelFactory
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +52,8 @@ fun AlbumDetailScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Atrás",
-                            tint = Color.Black
+                            tint = Color.Black,
+                            modifier = Modifier.testTag("nav_back")
                         )
                     }
                 },
@@ -81,7 +83,7 @@ fun AlbumDetailScreen(
                 AsyncImage(
                     model = album.cover,
                     contentDescription = "Portada",
-                    modifier = Modifier.size(80.dp),
+                    modifier = Modifier.size(80.dp) ,
                     contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.height(16.dp))
