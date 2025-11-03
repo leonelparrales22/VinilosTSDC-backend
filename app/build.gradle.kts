@@ -23,7 +23,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/\"")
         }
         release {
-            buildConfigField("String", "BASE_URL", "\"https://heroku.com/\"")
+            buildConfigField("String", "BASE_URL", "\"https://vynils-back-heroku.herokuapp.com/\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
