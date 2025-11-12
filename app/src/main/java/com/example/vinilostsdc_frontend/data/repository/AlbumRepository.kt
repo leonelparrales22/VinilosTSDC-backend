@@ -3,8 +3,10 @@ package com.example.vinilostsdc_frontend.data.repository
 import com.example.vinilostsdc_frontend.data.model.Album
 import com.example.vinilostsdc_frontend.data.model.CreateAlbumRequest
 import com.example.vinilostsdc_frontend.data.service.ApiService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 sealed class Resource<T> {
     data class Success<T>(val data: T) : Resource<T>()
@@ -25,7 +27,7 @@ class AlbumRepositoryImpl(
     override fun getAlbums(): Flow<Resource<List<Album>>> = flow {
         try {
             emit(Resource.Loading())
-            val response = apiService.getAlbums()
+            val response = withContext(Dispatchers.IO) { apiService.getAlbums() }
             if (response.isSuccessful) {
                 val albums = response.body() ?: emptyList()
                 emit(Resource.Success(albums))
@@ -40,7 +42,7 @@ class AlbumRepositoryImpl(
     override fun getAlbumById(id: Int): Flow<Resource<Album>> = flow {
         try {
             emit(Resource.Loading())
-            val response = apiService.getAlbumById(id)
+            val response = withContext(Dispatchers.IO) { apiService.getAlbumById(id) }
             if (response.isSuccessful) {
                 val album = response.body()
                 if (album != null) {
@@ -59,7 +61,7 @@ class AlbumRepositoryImpl(
     override fun createAlbum(albumRequest: CreateAlbumRequest): Flow<Resource<Album>> = flow {
         try {
             emit(Resource.Loading())
-            val response = apiService.createAlbum(albumRequest)
+            val response = withContext(Dispatchers.IO) { apiService.createAlbum(albumRequest) }
             if (response.isSuccessful) {
                 val album = response.body()
                 if (album != null) {
