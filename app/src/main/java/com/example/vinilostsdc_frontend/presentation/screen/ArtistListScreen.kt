@@ -166,19 +166,14 @@ fun ArtistItem(
             modifier = Modifier.fillMaxSize().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            coil.compose.AsyncImage(
-                model = artist.image,
-                contentDescription = "Foto del artista",
-                modifier = Modifier.size(48.dp).padding(end = 12.dp),
-                contentScale = ContentScale.Crop
-            )
             Text(
                 text = artist.name,
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 16.dp)
             )
         }
     }

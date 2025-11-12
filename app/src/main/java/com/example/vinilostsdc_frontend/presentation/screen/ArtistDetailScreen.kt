@@ -18,6 +18,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.vinilostsdc_frontend.presentation.viewmodel.ArtistViewModel
 import com.example.vinilostsdc_frontend.presentation.viewmodel.ArtistViewModelFactory
+import android.content.Context
+import coil.ImageLoader
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
+import androidx.compose.ui.platform.LocalContext
+fun customImageLoader(context: Context): ImageLoader {
+    val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(object : Interceptor {
+            override fun intercept(chain: Interceptor.Chain): Response {
+                val newRequest = chain.request().newBuilder()
+                    .header("User-Agent", "Mozilla/5.0 (Android) Chrome/120.0.0.0 Mobile")
+                    .build()
+                return chain.proceed(newRequest)
+            }
+        })
+        .build()
+    return ImageLoader.Builder(context)
+        .okHttpClient(okHttpClient)
+        .build()
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,16 +101,21 @@ fun ArtistDetailScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 // Imagen circular con placeholder
                 Card(
-                    modifier = Modifier.size(80.dp),
-                    shape = RoundedCornerShape(40.dp),
+                    modifier = Modifier.size(100.dp),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFEDEDED))
                 ) {
+                    val context = LocalContext.current
+                    val imageLoader = customImageLoader(context)
                     AsyncImage(
                         model = artist.image,
                         contentDescription = "Foto del artista",
-                        modifier = Modifier.size(80.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
                         contentScale = ContentScale.Crop,
+                        imageLoader = imageLoader,
                         placeholder = painterResource(id = android.R.drawable.ic_menu_report_image),
                         error = painterResource(id = android.R.drawable.ic_menu_report_image)
                     )
