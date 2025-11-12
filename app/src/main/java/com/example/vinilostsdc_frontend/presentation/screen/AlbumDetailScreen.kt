@@ -1,5 +1,11 @@
 package com.example.vinilostsdc_frontend.presentation.screen
 
+import androidx.compose.ui.platform.LocalContext
+import okhttp3.OkHttpClient
+import okhttp3.Interceptor
+import okhttp3.Response
+import coil.ImageLoader
+import coil.request.ImageRequest
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -34,6 +40,25 @@ fun AlbumDetailScreen(
     }
 
     val album = uiState.selectedAlbum
+
+    val context = LocalContext.current
+
+    // Custom Coil ImageLoader with User-Agent interceptor for Wikimedia
+    val imageLoader = remember {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(object : Interceptor {
+                override fun intercept(chain: Interceptor.Chain): Response {
+                    val request = chain.request().newBuilder()
+                        .header("User-Agent", "Mozilla/5.0 (Android) Coil")
+                        .build()
+                    return chain.proceed(request)
+                }
+            })
+            .build()
+        ImageLoader.Builder(context)
+            .okHttpClient(client)
+            .build()
+    }
 
     Scaffold(
         containerColor = Color(0xFFF8F4E6),
@@ -81,9 +106,13 @@ fun AlbumDetailScreen(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 AsyncImage(
-                    model = album.cover,
+                    model = ImageRequest.Builder(context)
+                        .data(album.cover)
+                        .crossfade(true)
+                        .build(),
+                    imageLoader = imageLoader,
                     contentDescription = "Portada",
-                    modifier = Modifier.size(80.dp) ,
+                    modifier = Modifier.size(80.dp),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.height(16.dp))
