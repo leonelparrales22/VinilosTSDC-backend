@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Album
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -179,8 +180,8 @@ fun AlbumItem(
                 modifier = Modifier.weight(1f)
             )
             Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Persona",
+                imageVector = Icons.Default.Album,
+                contentDescription = "Disco",
                 tint = Color(0xFF3F51B5),
                 modifier = Modifier.size(24.dp)
             )
