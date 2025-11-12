@@ -1,7 +1,9 @@
 package com.example.vinilostsdc_frontend.data.model
 
+import androidx.compose.runtime.Immutable
 import com.google.gson.annotations.SerializedName
 
+@Immutable
 data class Artist(
     @SerializedName("id")
     val id: Int = 0,

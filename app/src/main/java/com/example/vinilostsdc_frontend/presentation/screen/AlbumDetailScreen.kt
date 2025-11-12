@@ -43,7 +43,7 @@ fun AlbumDetailScreen(
 
     val context = LocalContext.current
 
-    // Custom Coil ImageLoader with User-Agent interceptor for Wikimedia
+    // Custom Coil ImageLoader with User-Agent interceptor for Wikimedia, optimized for memory
     val imageLoader = remember {
         val client = OkHttpClient.Builder()
             .addInterceptor(object : Interceptor {
@@ -57,6 +57,8 @@ fun AlbumDetailScreen(
             .build()
         ImageLoader.Builder(context)
             .okHttpClient(client)
+            .memoryCachePolicy(coil.request.CachePolicy.DISABLED) // Disable memory cache to reduce memory usage
+            .diskCachePolicy(coil.request.CachePolicy.ENABLED) // Keep disk cache for performance
             .build()
     }
 

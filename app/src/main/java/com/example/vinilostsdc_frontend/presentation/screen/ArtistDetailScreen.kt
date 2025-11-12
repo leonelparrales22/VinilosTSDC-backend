@@ -37,6 +37,8 @@ fun customImageLoader(context: Context): ImageLoader {
         .build()
     return ImageLoader.Builder(context)
         .okHttpClient(okHttpClient)
+        .memoryCachePolicy(coil.request.CachePolicy.DISABLED) // Disable memory cache to reduce memory usage
+        .diskCachePolicy(coil.request.CachePolicy.ENABLED) // Keep disk cache for performance
         .build()
 }
 
