@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.vinilostsdc_frontend.data.model.Artist
 import com.example.vinilostsdc_frontend.presentation.viewmodel.ArtistViewModel
@@ -81,26 +82,27 @@ fun ArtistListScreen(
                     value = searchText,
                     onValueChange = { searchText = it },
                     label = { Text("Nombre del artista") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).testTag("searchBox")
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = { /* Implementar búsqueda si es necesario */ },
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED)),
+                    modifier = Modifier.testTag("searchButton")
                 ) {
                     Text("Buscar", color = Color.Black)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxSize().testTag("centralBox")) {
                 when {
                     uiState.isLoading -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
                     uiState.errorMessage != null -> {
                         Column(
-                            modifier = Modifier.align(Alignment.Center),
+                            modifier = Modifier.align(Alignment.Center).testTag("errorMessage"),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
@@ -123,13 +125,13 @@ fun ArtistListScreen(
                     uiState.artists.isEmpty() -> {
                         Text(
                             text = "No hay artistas disponibles",
-                            modifier = Modifier.align(Alignment.Center),
+                            modifier = Modifier.align(Alignment.Center).testTag("emptyArtistListErrorMessage"),
                             color = Color.Black
                         )
                     }
                     else -> {
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().testTag("artistList"),
                             contentPadding = PaddingValues(vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -155,7 +157,8 @@ fun ArtistItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp),
+            .height(64.dp)
+            .testTag("artistListItem"),
         onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFEDEDED)
