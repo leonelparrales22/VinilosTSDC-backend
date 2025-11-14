@@ -5,12 +5,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Album
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,9 +33,10 @@ fun AlbumListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchText by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.getAlbums()
+        viewModel.getAlbums(context)
     }
 
     Scaffold(
@@ -52,7 +56,7 @@ fun AlbumListScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Atrás",
                             tint = Color.Black
                         )
@@ -111,7 +115,7 @@ fun AlbumListScreen(
                             Button(
                                 onClick = {
                                     viewModel.clearError()
-                                    viewModel.getAlbums()
+                                    viewModel.getAlbums(context)
                                 },
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
@@ -164,9 +168,9 @@ fun AlbumItem(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.CenterStart
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = album.name,
@@ -175,7 +179,13 @@ fun AlbumItem(
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(start = 16.dp)
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = Icons.Default.Album,
+                contentDescription = "Disco",
+                tint = Color(0xFF3F51B5),
+                modifier = Modifier.size(24.dp)
             )
         }
     }

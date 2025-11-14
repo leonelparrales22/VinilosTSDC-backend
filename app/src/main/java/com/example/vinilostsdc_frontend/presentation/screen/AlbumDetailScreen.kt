@@ -1,9 +1,15 @@
 package com.example.vinilostsdc_frontend.presentation.screen
 
+import androidx.compose.ui.platform.LocalContext
+import okhttp3.OkHttpClient
+import okhttp3.Interceptor
+import okhttp3.Response
+import coil.ImageLoader
+import coil.request.ImageRequest
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,12 +34,32 @@ fun AlbumDetailScreen(
     viewModel: AlbumViewModel = androidx.lifecycle.viewmodel.compose.viewModel<AlbumViewModel>(factory = AlbumViewModelFactory())
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(albumId) {
-        viewModel.getAlbumById(albumId)
+        viewModel.getAlbumById(context, albumId)
     }
 
     val album = uiState.selectedAlbum
+
+    // Custom Coil ImageLoader with User-Agent interceptor for Wikimedia, optimized for memory
+    val imageLoader = remember {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(object : Interceptor {
+                override fun intercept(chain: Interceptor.Chain): Response {
+                    val request = chain.request().newBuilder()
+                        .header("User-Agent", "Mozilla/5.0 (Android) Coil")
+                        .build()
+                    return chain.proceed(request)
+                }
+            })
+            .build()
+        ImageLoader.Builder(context)
+            .okHttpClient(client)
+            .memoryCachePolicy(coil.request.CachePolicy.DISABLED) // Disable memory cache to reduce memory usage
+            .diskCachePolicy(coil.request.CachePolicy.ENABLED) // Keep disk cache for performance
+            .build()
+    }
 
     Scaffold(
         containerColor = Color(0xFFF8F4E6),
@@ -50,7 +76,7 @@ fun AlbumDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Atrás",
                             tint = Color.Black,
                             modifier = Modifier.testTag("nav_back")
@@ -81,9 +107,13 @@ fun AlbumDetailScreen(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 AsyncImage(
-                    model = album.cover,
+                    model = ImageRequest.Builder(context)
+                        .data(album.cover)
+                        .crossfade(true)
+                        .build(),
+                    imageLoader = imageLoader,
                     contentDescription = "Portada",
-                    modifier = Modifier.size(80.dp) ,
+                    modifier = Modifier.size(80.dp),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.height(16.dp))

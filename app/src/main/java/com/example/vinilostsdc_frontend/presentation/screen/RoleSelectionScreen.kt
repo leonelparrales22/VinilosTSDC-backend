@@ -18,7 +18,7 @@ fun RoleSelectionScreen(
     onVisitante: () -> Unit,
     onColeccionista: () -> Unit
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(0) }
     val tabItems = listOf("Visitante", "Coleccionista")
 
     Scaffold(

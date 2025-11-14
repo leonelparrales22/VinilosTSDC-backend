@@ -2,8 +2,10 @@ package com.example.vinilostsdc_frontend.data.repository
 
 import com.example.vinilostsdc_frontend.data.model.Artist
 import com.example.vinilostsdc_frontend.data.service.ApiService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 interface ArtistRepository {
     fun getArtists(): Flow<Resource<List<Artist>>>
@@ -17,7 +19,7 @@ class ArtistRepositoryImpl(
     override fun getArtists(): Flow<Resource<List<Artist>>> = flow {
         try {
             emit(Resource.Loading())
-            val response = apiService.getArtists()
+            val response = withContext(Dispatchers.IO) { apiService.getArtists() }
             if (response.isSuccessful) {
                 val artists = response.body() ?: emptyList()
                 emit(Resource.Success(artists))
@@ -32,7 +34,7 @@ class ArtistRepositoryImpl(
     override fun getArtistById(id: Int): Flow<Resource<Artist>> = flow {
         try {
             emit(Resource.Loading())
-            val response = apiService.getArtistById(id)
+            val response = withContext(Dispatchers.IO) { apiService.getArtistById(id) }
             if (response.isSuccessful) {
                 val artist = response.body()
                 if (artist != null) {

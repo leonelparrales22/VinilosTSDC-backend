@@ -52,8 +52,18 @@ class MainActivity : ComponentActivity() {
                         ArtistListScreen(
                             onBack = { navController.popBackStack() },
                             onArtistClick = { artist ->
-                                // TODO: Navigate to artist detail
+                                navController.navigate("artist_detail/${artist.id}")
                             }
+                        )
+                    }
+                    composable(
+                        route = "artist_detail/{artistId}",
+                        arguments = listOf(navArgument("artistId") { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val artistId = backStackEntry.arguments?.getInt("artistId") ?: return@composable
+                        com.example.vinilostsdc_frontend.presentation.screen.ArtistDetailScreen(
+                            artistId = artistId,
+                            onBack = { navController.popBackStack() }
                         )
                     }
                     composable("collectors") {
