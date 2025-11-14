@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.vinilostsdc_frontend.data.model.Artist
 import com.example.vinilostsdc_frontend.presentation.viewmodel.ArtistViewModel
@@ -31,9 +31,10 @@ fun ArtistListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchText by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.getArtists()
+        viewModel.getArtists(context)
     }
 
     Scaffold(
@@ -111,7 +112,7 @@ fun ArtistListScreen(
                             Button(
                                 onClick = {
                                     viewModel.clearError()
-                                    viewModel.getArtists()
+                                    viewModel.getArtists(context)
                                 },
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))

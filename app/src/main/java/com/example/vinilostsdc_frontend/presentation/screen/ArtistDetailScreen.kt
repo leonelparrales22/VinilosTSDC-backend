@@ -50,9 +50,10 @@ fun ArtistDetailScreen(
     viewModel: ArtistViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = ArtistViewModelFactory())
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(artistId) {
-        viewModel.getArtistById(artistId)
+        viewModel.getArtistById(context, artistId)
     }
 
     val artist = uiState.selectedArtist

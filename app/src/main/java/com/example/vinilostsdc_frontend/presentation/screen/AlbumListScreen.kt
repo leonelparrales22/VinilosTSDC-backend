@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,9 +33,10 @@ fun AlbumListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchText by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.getAlbums()
+        viewModel.getAlbums(context)
     }
 
     Scaffold(
@@ -113,7 +115,7 @@ fun AlbumListScreen(
                             Button(
                                 onClick = {
                                     viewModel.clearError()
-                                    viewModel.getAlbums()
+                                    viewModel.getAlbums(context)
                                 },
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))

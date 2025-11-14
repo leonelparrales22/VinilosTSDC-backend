@@ -34,14 +34,13 @@ fun AlbumDetailScreen(
     viewModel: AlbumViewModel = androidx.lifecycle.viewmodel.compose.viewModel<AlbumViewModel>(factory = AlbumViewModelFactory())
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(albumId) {
-        viewModel.getAlbumById(albumId)
+        viewModel.getAlbumById(context, albumId)
     }
 
     val album = uiState.selectedAlbum
-
-    val context = LocalContext.current
 
     // Custom Coil ImageLoader with User-Agent interceptor for Wikimedia, optimized for memory
     val imageLoader = remember {

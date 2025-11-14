@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.vinilostsdc_frontend.data.model.Collector
 import com.example.vinilostsdc_frontend.presentation.viewmodel.CollectorViewModel
@@ -29,9 +30,10 @@ fun CollectorListScreen(
     viewModel: CollectorViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = CollectorViewModelFactory())
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.getCollectors()
+        viewModel.getCollectors(context)
     }
 
     Scaffold(
@@ -110,7 +112,7 @@ fun CollectorListScreen(
                             Button(
                                 onClick = {
                                     viewModel.clearError()
-                                    viewModel.getCollectors()
+                                    viewModel.getCollectors(context)
                                 },
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
