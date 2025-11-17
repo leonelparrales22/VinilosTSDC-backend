@@ -5,7 +5,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.vinilostsdc_frontend.data.model.Artist
 import com.example.vinilostsdc_frontend.presentation.viewmodel.ArtistViewModel
@@ -28,84 +30,116 @@ fun ArtistListScreen(
     viewModel: ArtistViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = ArtistViewModelFactory())
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var searchText by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.getArtists()
+        viewModel.getArtists(context)
     }
 
     Scaffold(
+        containerColor = Color(0xFFF8F4E6), // Fondo claro
         topBar = {
             TopAppBar(
-                title = { 
-                    Text(
-                        text = "Listado de Artistas", 
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    ) 
+                title = {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "Artistas",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            Icons.Default.ArrowBack, 
-                            contentDescription = "Atrás", 
-                            tint = Color.White
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Atrás",
+                            tint = Color.Black
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF424242)
+                    containerColor = Color(0xFFEDEDED)
                 )
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    label = { Text("Nombre del artista") },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = { /* Implementar búsqueda si es necesario */ },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED))
+                ) {
+                    Text("Buscar", color = Color.Black)
                 }
-                uiState.errorMessage != null -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = uiState.errorMessage ?: "Error desconocido",
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Button(
-                            onClick = { 
-                                viewModel.clearError()
-                                viewModel.getArtists()
-                            }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(modifier = Modifier.fillMaxSize()) {
+                when {
+                    uiState.isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                    uiState.errorMessage != null -> {
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("Reintentar")
+                            Text(
+                                text = uiState.errorMessage ?: "Error desconocido",
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                            Button(
+                                onClick = {
+                                    viewModel.clearError()
+                                    viewModel.getArtists(context)
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))
+                            ) {
+                                Text("Reintentar", color = Color.White)
+                            }
                         }
                     }
-                }
-                uiState.artists.isEmpty() -> {
-                    Text(
-                        text = "No hay artistas disponibles",
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(uiState.artists) { artist ->
-                            ArtistItem(
-                                artist = artist,
-                                onClick = { onArtistClick(artist) }
-                            )
+                    uiState.artists.isEmpty() -> {
+                        Text(
+                            text = "No hay artistas disponibles",
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Color.Black
+                        )
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(uiState.artists.filter { it.name.contains(searchText, ignoreCase = true) }) { artist ->
+                                ArtistItem(
+                                    artist = artist,
+                                    onClick = { onArtistClick(artist) }
+                                )
+                            }
                         }
                     }
                 }
@@ -122,52 +156,33 @@ fun ArtistItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(64.dp),
         onClick = onClick,
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF666666)
+            containerColor = Color(0xFFEDEDED)
         ),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
+            Text(
+                text = artist.name,
+                color = Color.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = artist.name,
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = artist.description,
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 14.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                if (artist.birthDate != null) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "Nacimiento: ${artist.birthDate}",
-                        color = Color.White.copy(alpha = 0.6f),
-                        fontSize = 12.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
+            )
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Persona",
+                tint = Color(0xFF3F51B5),
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }

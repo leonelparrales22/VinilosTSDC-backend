@@ -2,8 +2,10 @@ package com.example.vinilostsdc_frontend.data.repository
 
 import com.example.vinilostsdc_frontend.data.model.Collector
 import com.example.vinilostsdc_frontend.data.service.ApiService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 interface CollectorRepository {
     fun getCollectors(): Flow<Resource<List<Collector>>>
@@ -17,7 +19,7 @@ class CollectorRepositoryImpl(
     override fun getCollectors(): Flow<Resource<List<Collector>>> = flow {
         try {
             emit(Resource.Loading())
-            val response = apiService.getCollectors()
+            val response = withContext(Dispatchers.IO) { apiService.getCollectors() }
             if (response.isSuccessful) {
                 val collectors = response.body() ?: emptyList()
                 emit(Resource.Success(collectors))
@@ -32,7 +34,7 @@ class CollectorRepositoryImpl(
     override fun getCollectorById(id: Int): Flow<Resource<Collector>> = flow {
         try {
             emit(Resource.Loading())
-            val response = apiService.getCollectorById(id)
+            val response = withContext(Dispatchers.IO) { apiService.getCollectorById(id) }
             if (response.isSuccessful) {
                 val collector = response.body()
                 if (collector != null) {

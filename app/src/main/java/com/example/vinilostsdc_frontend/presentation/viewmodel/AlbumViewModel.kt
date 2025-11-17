@@ -1,5 +1,6 @@
 package com.example.vinilostsdc_frontend.presentation.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.example.vinilostsdc_frontend.data.model.CreateAlbumRequest
 import com.example.vinilostsdc_frontend.data.repository.AlbumRepository
 import com.example.vinilostsdc_frontend.data.repository.Resource
 import com.example.vinilostsdc_frontend.di.RepositoryModule
+import com.example.vinilostsdc_frontend.utils.ProfilingUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,56 +31,86 @@ class AlbumViewModel(
     private val _uiState = MutableStateFlow(AlbumUiState())
     val uiState: StateFlow<AlbumUiState> = _uiState.asStateFlow()
 
-    fun getAlbums() {
+    fun getAlbums(context: Context? = null) {
         viewModelScope.launch {
-            albumRepository.getAlbums().collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = true,
-                            errorMessage = null
-                        )
+            if (context != null) {
+                ProfilingUtils.profileOperation(context, "HU01 - Consultar catálogo de álbumes") {
+                    albumRepository.getAlbums().collect { resource ->
+                        when (resource) {
+                            is Resource.Loading -> {
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = true,
+                                    errorMessage = null
+                                )
+                            }
+                            is Resource.Success -> {
+                                _uiState.value = _uiState.value.copy(
+                                    albums = resource.data,
+                                    isLoading = false,
+                                    errorMessage = null
+                                )
+                            }
+                            is Resource.Error -> {
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = false,
+                                    errorMessage = resource.message
+                                )
+                            }
+                        }
                     }
-                    is Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            albums = resource.data,
-                            isLoading = false,
-                            errorMessage = null
-                        )
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            errorMessage = resource.message
-                        )
+                }
+            } else {
+                albumRepository.getAlbums().collect { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = true,
+                                errorMessage = null
+                            )
+                        }
+                        is Resource.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                albums = resource.data,
+                                isLoading = false,
+                                errorMessage = null
+                            )
+                        }
+                        is Resource.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                errorMessage = resource.message
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
-    fun getAlbumById(id: Int) {
+    fun getAlbumById(context: Context, id: Int) {
         viewModelScope.launch {
-            albumRepository.getAlbumById(id).collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = true,
-                            errorMessage = null
-                        )
-                    }
-                    is Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            selectedAlbum = resource.data,
-                            isLoading = false,
-                            errorMessage = null
-                        )
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            errorMessage = resource.message
-                        )
+            ProfilingUtils.profileOperation(context, "HU02 - Consultar la información detallada de un álbum") {
+                albumRepository.getAlbumById(id).collect { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = true,
+                                errorMessage = null
+                            )
+                        }
+                        is Resource.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                selectedAlbum = resource.data,
+                                isLoading = false,
+                                errorMessage = null
+                            )
+                        }
+                        is Resource.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                errorMessage = resource.message
+                            )
+                        }
                     }
                 }
             }

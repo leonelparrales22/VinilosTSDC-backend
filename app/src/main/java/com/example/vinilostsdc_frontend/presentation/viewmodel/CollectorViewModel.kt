@@ -1,5 +1,6 @@
 package com.example.vinilostsdc_frontend.presentation.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import com.example.vinilostsdc_frontend.data.model.Collector
 import com.example.vinilostsdc_frontend.data.repository.CollectorRepository
 import com.example.vinilostsdc_frontend.data.repository.Resource
 import com.example.vinilostsdc_frontend.di.RepositoryModule
+import com.example.vinilostsdc_frontend.utils.ProfilingUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,28 +28,56 @@ class CollectorViewModel(
     private val _uiState = MutableStateFlow(CollectorUiState())
     val uiState: StateFlow<CollectorUiState> = _uiState.asStateFlow()
 
-    fun getCollectors() {
+    fun getCollectors(context: Context? = null) {
         viewModelScope.launch {
-            collectorRepository.getCollectors().collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = true,
-                            errorMessage = null
-                        )
+            if (context != null) {
+                ProfilingUtils.profileOperation(context, "HU05 - Consultar listado de coleccionistas") {
+                    collectorRepository.getCollectors().collect { resource ->
+                        when (resource) {
+                            is Resource.Loading -> {
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = true,
+                                    errorMessage = null
+                                )
+                            }
+                            is Resource.Success -> {
+                                _uiState.value = _uiState.value.copy(
+                                    collectors = resource.data,
+                                    isLoading = false,
+                                    errorMessage = null
+                                )
+                            }
+                            is Resource.Error -> {
+                                _uiState.value = _uiState.value.copy(
+                                    isLoading = false,
+                                    errorMessage = resource.message
+                                )
+                            }
+                        }
                     }
-                    is Resource.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            collectors = resource.data,
-                            isLoading = false,
-                            errorMessage = null
-                        )
-                    }
-                    is Resource.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            errorMessage = resource.message
-                        )
+                }
+            } else {
+                collectorRepository.getCollectors().collect { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = true,
+                                errorMessage = null
+                            )
+                        }
+                        is Resource.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                collectors = resource.data,
+                                isLoading = false,
+                                errorMessage = null
+                            )
+                        }
+                        is Resource.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                errorMessage = resource.message
+                            )
+                        }
                     }
                 }
             }
