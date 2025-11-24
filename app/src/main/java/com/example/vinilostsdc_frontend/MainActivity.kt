@@ -27,9 +27,15 @@ class MainActivity : ComponentActivity() {
                     composable("main") {
                         RoleSelectionScreen(
                             onVisitante = { navController.navigate("visitante") },
-                            onColeccionista = { /* Pendiente de desarrollar */ }
+                            onColeccionista = { navController.navigate("collector_menu") }
                         )
                     }
+                    composable("album_create") {
+                        com.example.vinilostsdc_frontend.presentation.screen.AlbumCreateScreen(navController)
+                    }
+                                        composable("collector_menu") {
+                                            com.example.vinilostsdc_frontend.presentation.screen.CollectorMenuScreen(navController)
+                                        }
                     composable("visitante") {
                         VisitanteMenuScreen(navController)
                     }
