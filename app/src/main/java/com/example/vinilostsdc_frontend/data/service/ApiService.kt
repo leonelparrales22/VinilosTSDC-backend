@@ -4,6 +4,8 @@ import com.example.vinilostsdc_frontend.data.model.Album
 import com.example.vinilostsdc_frontend.data.model.Artist
 import com.example.vinilostsdc_frontend.data.model.Collector
 import com.example.vinilostsdc_frontend.data.model.CreateAlbumRequest
+import com.example.vinilostsdc_frontend.data.model.CreateTrackRequest
+import com.example.vinilostsdc_frontend.data.model.Track
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -18,6 +20,9 @@ interface ApiService {
     
     @POST("albums")
     suspend fun createAlbum(@Body album: CreateAlbumRequest): Response<Album>
+    
+    @POST("albums/{albumId}/tracks")
+    suspend fun addTrackToAlbum(@Path("albumId") albumId: Int, @Body track: CreateTrackRequest): Response<Track>
     
     // Artists endpoints
     @GET("musicians")

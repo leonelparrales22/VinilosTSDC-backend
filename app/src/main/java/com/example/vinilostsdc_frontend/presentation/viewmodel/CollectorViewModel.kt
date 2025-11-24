@@ -8,7 +8,6 @@ import com.example.vinilostsdc_frontend.data.model.Collector
 import com.example.vinilostsdc_frontend.data.repository.CollectorRepository
 import com.example.vinilostsdc_frontend.data.repository.Resource
 import com.example.vinilostsdc_frontend.di.RepositoryModule
-import com.example.vinilostsdc_frontend.utils.ProfilingUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,61 +29,33 @@ class CollectorViewModel(
 
     fun getCollectors(context: Context? = null) {
         viewModelScope.launch {
-            if (context != null) {
-                ProfilingUtils.profileOperation(context, "HU05 - Consultar listado de coleccionistas") {
-                    collectorRepository.getCollectors().collect { resource ->
-                        when (resource) {
-                            is Resource.Loading -> {
-                                _uiState.value = _uiState.value.copy(
-                                    isLoading = true,
-                                    errorMessage = null
-                                )
-                            }
-                            is Resource.Success -> {
-                                _uiState.value = _uiState.value.copy(
-                                    collectors = resource.data,
-                                    isLoading = false,
-                                    errorMessage = null
-                                )
-                            }
-                            is Resource.Error -> {
-                                _uiState.value = _uiState.value.copy(
-                                    isLoading = false,
-                                    errorMessage = resource.message
-                                )
-                            }
-                        }
+            collectorRepository.getCollectors().collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = true,
+                            errorMessage = null
+                        )
                     }
-                }
-            } else {
-                collectorRepository.getCollectors().collect { resource ->
-                    when (resource) {
-                        is Resource.Loading -> {
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = true,
-                                errorMessage = null
-                            )
-                        }
-                        is Resource.Success -> {
-                            _uiState.value = _uiState.value.copy(
-                                collectors = resource.data,
-                                isLoading = false,
-                                errorMessage = null
-                            )
-                        }
-                        is Resource.Error -> {
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                errorMessage = resource.message
-                            )
-                        }
+                    is Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            collectors = resource.data,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                    is Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            errorMessage = resource.message
+                        )
                     }
                 }
             }
         }
     }
 
-    fun getCollectorById(id: Int) {
+    fun getCollectorById(context: Context, id: Int) {
         viewModelScope.launch {
             collectorRepository.getCollectorById(id).collect { resource ->
                 when (resource) {

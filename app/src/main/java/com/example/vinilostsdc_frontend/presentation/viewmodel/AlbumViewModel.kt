@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.vinilostsdc_frontend.data.model.Album
 import com.example.vinilostsdc_frontend.data.model.CreateAlbumRequest
+import com.example.vinilostsdc_frontend.data.model.CreateTrackRequest
 import com.example.vinilostsdc_frontend.data.repository.AlbumRepository
 import com.example.vinilostsdc_frontend.data.repository.Resource
 import com.example.vinilostsdc_frontend.di.RepositoryModule
@@ -21,7 +22,9 @@ data class AlbumUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val isCreatingAlbum: Boolean = false,
-    val albumCreated: Boolean = false
+    val albumCreated: Boolean = false,
+    val isAddingTrack: Boolean = false,
+    val trackAdded: Boolean = false
 )
 
 class AlbumViewModel(
@@ -146,6 +149,7 @@ class AlbumViewModel(
                     }
                     is Resource.Success -> {
                         _uiState.value = _uiState.value.copy(
+                            selectedAlbum = resource.data,
                             isCreatingAlbum = false,
                             errorMessage = null,
                             albumCreated = true
@@ -165,12 +169,53 @@ class AlbumViewModel(
         }
     }
 
+    fun addTrackToAlbum(albumId: Int, name: String, duration: String) {
+        viewModelScope.launch {
+            val trackRequest = CreateTrackRequest(
+                name = name,
+                duration = duration
+            )
+
+            albumRepository.addTrackToAlbum(albumId, trackRequest).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAddingTrack = true,
+                            errorMessage = null,
+                            trackAdded = false
+                        )
+                    }
+                    is Resource.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAddingTrack = false,
+                            errorMessage = null,
+                            trackAdded = true
+                        )
+                        // Optionally refresh the album details
+                        // getAlbumById(albumId)
+                    }
+                    is Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isAddingTrack = false,
+                            errorMessage = resource.message,
+                            trackAdded = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
     }
 
     fun clearAlbumCreated() {
         _uiState.value = _uiState.value.copy(albumCreated = false)
+    }
+
+    fun clearTrackAdded() {
+        _uiState.value = _uiState.value.copy(trackAdded = false)
     }
 }
 

@@ -2,6 +2,8 @@ package com.example.vinilostsdc_frontend.data.repository
 
 import com.example.vinilostsdc_frontend.data.model.Album
 import com.example.vinilostsdc_frontend.data.model.CreateAlbumRequest
+import com.example.vinilostsdc_frontend.data.model.CreateTrackRequest
+import com.example.vinilostsdc_frontend.data.model.Track
 import com.example.vinilostsdc_frontend.data.service.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +20,7 @@ interface AlbumRepository {
     fun getAlbums(): Flow<Resource<List<Album>>>
     fun getAlbumById(id: Int): Flow<Resource<Album>>
     fun createAlbum(albumRequest: CreateAlbumRequest): Flow<Resource<Album>>
+    fun addTrackToAlbum(albumId: Int, trackRequest: CreateTrackRequest): Flow<Resource<Track>>
 }
 
 class AlbumRepositoryImpl(
@@ -71,6 +74,25 @@ class AlbumRepositoryImpl(
                 }
             } else {
                 emit(Resource.Error("Error al crear el álbum: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error("Error de conexión: ${e.localizedMessage}"))
+        }
+    }
+
+    override fun addTrackToAlbum(albumId: Int, trackRequest: CreateTrackRequest): Flow<Resource<Track>> = flow {
+        try {
+            emit(Resource.Loading())
+            val response = withContext(Dispatchers.IO) { apiService.addTrackToAlbum(albumId, trackRequest) }
+            if (response.isSuccessful) {
+                val track = response.body()
+                if (track != null) {
+                    emit(Resource.Success(track))
+                } else {
+                    emit(Resource.Error("Error al agregar el track"))
+                }
+            } else {
+                emit(Resource.Error("Error al agregar el track: ${response.code()}"))
             }
         } catch (e: Exception) {
             emit(Resource.Error("Error de conexión: ${e.localizedMessage}"))

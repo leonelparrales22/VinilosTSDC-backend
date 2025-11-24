@@ -14,6 +14,7 @@ import com.example.vinilostsdc_frontend.presentation.screen.ArtistListScreen
 import com.example.vinilostsdc_frontend.presentation.screen.CollectorListScreen
 import com.example.vinilostsdc_frontend.presentation.screen.VisitanteMenuScreen
 import com.example.vinilostsdc_frontend.presentation.screen.RoleSelectionScreen
+import com.example.vinilostsdc_frontend.presentation.screen.CollectorDetailScreen
 import com.example.vinilostsdc_frontend.ui.theme.VinilosTSDCfrontendTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,9 +27,15 @@ class MainActivity : ComponentActivity() {
                     composable("main") {
                         RoleSelectionScreen(
                             onVisitante = { navController.navigate("visitante") },
-                            onColeccionista = { /* Pendiente de desarrollar */ }
+                            onColeccionista = { navController.navigate("collector_menu") }
                         )
                     }
+                    composable("album_create") {
+                        com.example.vinilostsdc_frontend.presentation.screen.AlbumCreateScreen(navController)
+                    }
+                                        composable("collector_menu") {
+                                            com.example.vinilostsdc_frontend.presentation.screen.CollectorMenuScreen(navController)
+                                        }
                     composable("visitante") {
                         VisitanteMenuScreen(navController)
                     }
@@ -70,8 +77,18 @@ class MainActivity : ComponentActivity() {
                         CollectorListScreen(
                             onBack = { navController.popBackStack() },
                             onCollectorClick = { collector ->
-                                // TODO: Navigate to collector detail
+                                navController.navigate("collector_detail/${collector.id}")
                             }
+                        )
+                    }
+                    composable(
+                        route = "collector_detail/{collectorId}",
+                        arguments = listOf(navArgument("collectorId") { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val collectorId = backStackEntry.arguments?.getInt("collectorId") ?: return@composable
+                        CollectorDetailScreen(
+                            collectorId = collectorId,
+                            onBack = { navController.popBackStack() }
                         )
                     }
                 }
