@@ -199,7 +199,8 @@ fun CollectorDetailScreen(
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
+                                    .padding(vertical = 4.dp)
+                                    .testTag("albumListItem"),
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFFEDEDED)),
                                 shape = RoundedCornerShape(12.dp),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
