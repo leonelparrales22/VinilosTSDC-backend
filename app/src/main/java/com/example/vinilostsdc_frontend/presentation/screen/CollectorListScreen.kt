@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -82,26 +83,27 @@ fun CollectorListScreen(
                     value = searchText,
                     onValueChange = { searchText = it },
                     label = { Text("Nombre coleccionista") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).testTag("searchBox")
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = { /* Implementar búsqueda si es necesario */ },
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEDED)),
+                    modifier = Modifier.testTag("searchButton")
                 ) {
                     Text("Buscar", color = Color.Black)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxSize().testTag("centralBox")) {
                 when {
                     uiState.isLoading -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
                     uiState.errorMessage != null -> {
                         Column(
-                            modifier = Modifier.align(Alignment.Center),
+                            modifier = Modifier.align(Alignment.Center).testTag("errorMessage"),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
@@ -124,13 +126,13 @@ fun CollectorListScreen(
                     uiState.collectors.isEmpty() -> {
                         Text(
                             text = "No hay coleccionistas disponibles",
-                            modifier = Modifier.align(Alignment.Center),
+                            modifier = Modifier.align(Alignment.Center).testTag("emptyCollectorListMessage"),
                             color = Color.Black
                         )
                     }
                     else -> {
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().testTag("collectorList"),
                             contentPadding = PaddingValues(vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -156,7 +158,8 @@ fun CollectorItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
+            .height(48.dp)
+            .testTag("collectorListItem"),
         onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFEDEDED)
