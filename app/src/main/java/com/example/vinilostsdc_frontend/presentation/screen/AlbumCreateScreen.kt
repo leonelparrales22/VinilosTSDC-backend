@@ -169,7 +169,7 @@ fun AlbumCreateScreen(
             item {
                 OutlinedTextField(
                     value = coverUrl,
-                    onValueChange = { coverUrl = it; coverError = null },
+                    onValueChange = { if (it.length <= 500) { coverUrl = it; coverError = null } },
                     label = { Text("Enlace de portada (URL)") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -185,7 +185,7 @@ fun AlbumCreateScreen(
             item {
                 OutlinedTextField(
                     value = albumName,
-                    onValueChange = { albumName = it; nameError = null },
+                    onValueChange = { if (it.length <= 100) { albumName = it; nameError = null } },
                     label = { Text("Nombre del álbum") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -223,7 +223,7 @@ fun AlbumCreateScreen(
             item {
                 OutlinedTextField(
                     value = genre,
-                    onValueChange = { genre = it; genreError = null },
+                    onValueChange = { if (it.length <= 50) { genre = it; genreError = null } },
                     label = { Text("Género musical") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -239,7 +239,7 @@ fun AlbumCreateScreen(
             item {
                 OutlinedTextField(
                     value = recordLabel,
-                    onValueChange = { recordLabel = it },
+                    onValueChange = { if (it.length <= 100) recordLabel = it },
                     label = { Text("Sello discográfico (opcional)") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -253,7 +253,7 @@ fun AlbumCreateScreen(
             item {
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it; descriptionError = null },
+                    onValueChange = { if (it.length <= 500) { description = it; descriptionError = null } },
                     label = { Text("Descripción") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -290,7 +290,7 @@ fun AlbumCreateScreen(
                         ) {
                             OutlinedTextField(
                                 value = newTrackName,
-                                onValueChange = { newTrackName = it },
+                                onValueChange = { if (it.length <= 100) newTrackName = it },
                                 label = { Text("Título") },
                                 modifier = Modifier
                                     .weight(1f)
