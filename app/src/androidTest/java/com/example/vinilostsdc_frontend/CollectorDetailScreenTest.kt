@@ -42,7 +42,7 @@ class CollectorDetailScreenTest {
         composeRule.onNodeWithText(appTitle).assertIsDisplayed()
 
         val captureSetup1 = Screenshot.capture(composeRule.activity)
-        captureSetup1.name = "hu05_setup1_vinilos"
+        captureSetup1.name = "hu06_setup1_vinilos"
         captureSetup1.process()
 
         composeRule.onNodeWithText(visitorMenuItem).performClick()
@@ -58,7 +58,7 @@ class CollectorDetailScreenTest {
         composeRule.onNodeWithText(collectorsMenuItem).assertIsDisplayed()
 
         val captureSetup2 = Screenshot.capture(composeRule.activity)
-        captureSetup2.name = "hu05_setup2_visitante"
+        captureSetup2.name = "hu06_setup2_visitante"
         captureSetup2.process()
 
         composeRule.onNodeWithText(collectorsMenuItem).performClick()
@@ -72,7 +72,7 @@ class CollectorDetailScreenTest {
     }
 
     /**
-     * Test Case 1: CollectorDetailScreenTest
+     * Test Case 1: Listado - Al abrir la pantalla hay un listado con 2 coleccionistas
      */
     @Test
     fun hu06_testCase1_openCollectorList() {

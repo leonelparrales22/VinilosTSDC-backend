@@ -212,7 +212,7 @@ fun AlbumCreateScreen(
                     isError = releaseDateError != null,
                     supportingText = releaseDateError?.let { { Text(it) } },
                     trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
+                        IconButton(onClick = { showDatePicker = true }, modifier = Modifier.testTag("datePickerButton")) {
                             Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha")
                         }
                     }
@@ -337,7 +337,7 @@ fun AlbumCreateScreen(
                                         newTrackSec = ""
                                     }
                                 },
-                                modifier = Modifier.semantics { contentDescription = "Botón para agregar track" }
+                                modifier = Modifier.testTag("addTrackButton").semantics { contentDescription = "Botón para agregar track" }
                             ) {
                                 Icon(Icons.Default.Add, contentDescription = null)
                             }
@@ -358,7 +358,7 @@ fun AlbumCreateScreen(
                                         .padding(12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Column(modifier = Modifier.weight(1f)) {
+                                    Column(modifier = Modifier.weight(1f).testTag("trackItem")) {
                                         Text(
                                             text = track.name,
                                             fontWeight = FontWeight.Medium,
@@ -372,7 +372,7 @@ fun AlbumCreateScreen(
                                     }
                                     IconButton(
                                         onClick = { tracks = tracks.filter { it != track } },
-                                        modifier = Modifier.semantics { contentDescription = "Botón para eliminar track" }
+                                        modifier = Modifier.testTag("removeTrackButton").semantics { contentDescription = "Botón para eliminar track" }
                                     ) {
                                         Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red)
                                     }
@@ -432,6 +432,7 @@ fun AlbumCreateScreen(
 
     if (showDatePicker) {
         DatePickerDialog(
+            modifier = Modifier.testTag("datePickerControl"),
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
