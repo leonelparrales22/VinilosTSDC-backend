@@ -95,3 +95,6 @@ yarn-error.log*
 # Optional: Uncomment if using Firebase
 # firebase-debug.log
 # crashlytics-build.properties
+
+# Testing functionality
+test-results/

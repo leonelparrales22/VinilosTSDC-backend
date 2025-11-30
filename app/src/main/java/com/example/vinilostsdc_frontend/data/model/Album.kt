@@ -51,3 +51,9 @@ data class CreateAlbumRequest(
     val genre: String,
     val recordLabel: String? = null
 )
+
+@Immutable
+data class CreateTrackRequest(
+    val name: String,
+    val duration: String
+)
